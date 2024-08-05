@@ -6,6 +6,8 @@ from django.views.generic.edit import UpdateView
 from django.urls import reverse_lazy
 from .models import Book
 from .forms import BookForm
+from rest_framework import generics
+from books.serializers import BookSerializer
 
 def search_books(title='', author=''):
     """
@@ -92,15 +94,19 @@ class BookListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        # title_query = self.request.GET.get('title')
-        # author_query = self.request.GET.get('author')
+        title_query = self.request.GET.get('title')
+        author_query = self.request.GET.get('author')
 
-        # if title_query:
-        #     queryset = queryset.filter(title__icontains=title_query)
-        # if author_query:
-        #     queryset = queryset.filter(author__icontains=author_query)
+        if title_query:
+            queryset = queryset.filter(title__icontains=title_query)
+        if author_query:
+            queryset = queryset.filter(author__icontains=author_query)
             
         return queryset
+    
+class BookListViewDRF(generics.ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
 
 class AddBookView(CreateView):
     model = Book
