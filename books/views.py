@@ -104,7 +104,11 @@ class BookListView(ListView):
             
         return queryset
     
-class BookListViewDRF(generics.ListAPIView):
+class BookListViewDRF(generics.ListCreateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
