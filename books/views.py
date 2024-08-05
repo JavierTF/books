@@ -1,5 +1,5 @@
 import requests
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.generic import ListView, CreateView, DetailView, DeleteView
 from django.views.generic.edit import UpdateView
@@ -71,17 +71,19 @@ def book_search_view(request):
         Book.objects.update_or_create(
             title=filtered_book['title'],
             author=filtered_book['author_name'],
+            isbn=filtered_book['isbn'],
+            cover_image=filtered_book['cover_url'],
             defaults={
-                'isbn': filtered_book['isbn'],
                 'publication_date': publication_date,
                 'pages': pages,
-                'cover_image': filtered_book['cover_url']
             }
         )
         
         filtered_books.append(filtered_book)
+
+        return redirect('books:book_list')
     
-    return JsonResponse(filtered_books, safe=False)
+    # return JsonResponse(filtered_books, safe=False)
 
 class BookListView(ListView):
     model = Book
@@ -90,13 +92,13 @@ class BookListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        title_query = self.request.GET.get('title')
-        author_query = self.request.GET.get('author')
+        # title_query = self.request.GET.get('title')
+        # author_query = self.request.GET.get('author')
 
-        if title_query:
-            queryset = queryset.filter(title__icontains=title_query)
-        if author_query:
-            queryset = queryset.filter(author__icontains=author_query)
+        # if title_query:
+        #     queryset = queryset.filter(title__icontains=title_query)
+        # if author_query:
+        #     queryset = queryset.filter(author__icontains=author_query)
             
         return queryset
 
