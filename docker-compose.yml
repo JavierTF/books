@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Servicio de Django
+  web:
+    build: .
+    command: gunicorn openlibrary.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DJANGO_SETTINGS_MODULE=openlibrary.settings
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/openlibrary
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+  # Servicio de PostgreSQL
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: openlibrary
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  # Servicio de Redis
+  redis:
+    image: redis:6
+
+  # Servicio de Celery
+  celery:
+    build: .
+    command: celery -A openlibrary worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - web
+    environment:
+      - DJANGO_SETTINGS_MODULE=openlibrary.settings
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+  # Servicio de Celery Beat
+  celery-beat:
+    build: .
+    command: celery -A openlibrary beat --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - web
+    environment:
+      - DJANGO_SETTINGS_MODULE=openlibrary.settings
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+volumes:
+  postgres_data:

@@ -4,7 +4,7 @@
 {% block title %}Book List{% endblock %}
 
 {% block content %}    
-    <form method="GET" action="{% url 'books:book_search' %}" class="d-flex mb-4">
+    <form method="GET" class="d-flex mb-4">
         <div class="form-group mr-2">
             <input type="text" name="title" class="form-control" placeholder="Search by Title" value="{{ request.GET.title }}">
         </div>
