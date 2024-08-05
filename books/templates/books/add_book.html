@@ -76,5 +76,6 @@
             {% endif %}
         </div>
         <button type="submit" class="btn btn-primary">Add Book</button>
+        <a href="{% url 'books:book_list' %}" class="btn btn-secondary">Cancel</a>
     </form>
 {% endblock %}

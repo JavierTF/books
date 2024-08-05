@@ -2,6 +2,7 @@ import requests
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.generic import ListView, CreateView
+from django.views.generic.edit import UpdateView
 from django.urls import reverse_lazy
 from .models import Book
 from .forms import BookForm
@@ -16,6 +17,16 @@ class AddBookView(CreateView):
     form_class = BookForm
     template_name = 'books/add_book.html'
     success_url = reverse_lazy('books:book_list')
+
+class EditBookView(UpdateView):
+    model = Book
+    form_class = BookForm
+    template_name = 'books/edit_book.html'
+    success_url = reverse_lazy('books:book_list')
+
+    def get_object(self, queryset=None):
+        # Obtiene el objeto Book basado en el ID de la URL
+        return Book.objects.get(pk=self.kwargs['pk'])
 
 def search_books_by_title(title):
     """
